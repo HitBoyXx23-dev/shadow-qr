@@ -2,27 +2,33 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Shadow QR</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
     <h1>⚫ Shadow QR</h1>
-    <p class="subtitle">Generate dark-themed QR codes for text, images, or files</p>
+    <p class="subtitle">Generate and Scan custom dark-themed QR codes</p>
 
     <div class="card">
       <h2>Create QR</h2>
-      <input type="text" id="qrInput" placeholder="Enter text or image URL"/>
-      <button id="generateBtn">Generate QR</button>
-
-      <p>or upload a file/photo</p>
+      <input type="text" id="qrInput" placeholder="Enter text or URL" />
       <input type="file" id="fileInput" />
-      <button id="uploadBtn">Upload & Generate QR</button>
-
+      <button id="generateBtn">Generate QR</button>
       <canvas id="qrCanvas" class="glow"></canvas>
+    </div>
+
+    <div class="card">
+      <h2>Scan QR Code</h2>
+      <video id="preview"></video>
+      <button id="scanBtn">Start Scan</button>
+      <p id="scanResult"></p>
     </div>
   </div>
 
+  <!-- html5-qrcode library -->
+  <script src="https://unpkg.com/html5-qrcode"></script>
   <script src="script.js"></script>
 </body>
 </html>
