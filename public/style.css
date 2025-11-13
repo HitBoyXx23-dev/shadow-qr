@@ -5,7 +5,7 @@ body {
   padding: 0;
   font-family: 'Orbitron', sans-serif;
   background: linear-gradient(135deg, #000010, #050014, #000030);
-  color: #fff;
+  color: #9b5de5; /* Purple text for visibility */
   text-align: center;
 }
 
@@ -26,7 +26,7 @@ h1 {
 }
 
 .card {
-  background: rgba(20, 15, 40, 0.95);
+  background: #0c001f; /* solid dark */
   border: 2px solid #5a00ff;
   border-radius: 20px;
   max-width: 450px;
@@ -40,9 +40,9 @@ input[type="text"], input[type="file"] {
   padding: 12px;
   margin: 10px 0;
   border-radius: 12px;
-  border: none;
-  background: #1b0133;
-  color: #fff;
+  border: 2px solid #5a00ff;
+  background: #100022;
+  color: #9b5de5;
   font-size: 1em;
 }
 
@@ -67,7 +67,7 @@ button:hover {
 canvas.glow {
   margin-top: 20px;
   border-radius: 12px;
-  background: #000;
+  background: #000; /* pure black canvas background */
   box-shadow: 0 0 40px #7a00ff, 0 0 80px #4e00c8;
 }
 
@@ -75,4 +75,14 @@ video {
   width: 100%;
   border-radius: 12px;
   margin-top: 10px;
+  background: #000; /* dark video background */
+  border: 2px solid #5a00ff;
+  box-shadow: 0 0 30px #5a00ff, 0 0 60px #4e00c8;
+}
+
+#scanResult {
+  color: #9b5de5;
+  margin-top: 10px;
+  font-weight: bold;
+  text-shadow: 0 0 10px #7a00ff;
 }
