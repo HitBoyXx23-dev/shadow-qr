@@ -1,33 +1,25 @@
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap');
-
-body {
+=body {
   background: radial-gradient(circle at top, #000010, #090014, #050010);
   color: #fff;
   font-family: 'Orbitron', sans-serif;
-  margin: 0;
-  padding: 0;
   text-align: center;
-}
-
-.container {
-  padding: 30px;
+  margin: 0;
+  padding: 20px;
 }
 
 h1 {
-  font-size: 2.5em;
   color: #9b5de5;
   text-shadow: 0 0 20px #5a00ff;
 }
 
 .subtitle {
   color: #6b7cff;
-  margin-bottom: 25px;
 }
 
 .card {
   background: rgba(15, 15, 35, 0.9);
   border: 2px solid #5a00ff;
-  box-shadow: 0 0 20px #4e00c8;
+  box-shadow: 0 0 25px #4e00c8;
   border-radius: 20px;
   padding: 25px;
   margin: 20px auto;
@@ -35,39 +27,32 @@ h1 {
   max-width: 400px;
 }
 
-input {
-  width: 80%;
+input, button {
+  margin-top: 10px;
   padding: 10px;
-  border: none;
   border-radius: 10px;
+  border: none;
+}
+
+input[type="text"] {
+  width: 80%;
   background: #1b0133;
   color: #fff;
-  margin-bottom: 10px;
 }
 
 button {
   background: linear-gradient(90deg, #5a00ff, #0011ff);
-  border: none;
   color: #fff;
-  padding: 10px 25px;
-  border-radius: 10px;
   cursor: pointer;
-  font-weight: bold;
-  transition: 0.2s;
 }
 
 button:hover {
   box-shadow: 0 0 15px #6b00ff;
 }
 
-canvas {
-  margin-top: 15px;
+canvas.glow {
+  margin-top: 20px;
+  border-radius: 12px;
   background: #000;
-  border-radius: 10px;
-}
-
-video {
-  width: 100%;
-  border-radius: 15px;
-  margin-top: 10px;
+  box-shadow: 0 0 30px #5a00ff;
 }
