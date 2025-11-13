@@ -8,9 +8,13 @@ const app = express();
 app.use(express.json());
 app.use(express.static("public"));
 
-// Storage for uploaded files
+// Create uploads directory if missing
+const uploadPath = path.join(__dirname, "public", "uploads");
+if (!fs.existsSync(uploadPath)) fs.mkdirSync(uploadPath, { recursive: true });
+
+// Multer storage config
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "public/uploads/"),
+  destination: (req, file, cb) => cb(null, uploadPath),
   filename: (req, file, cb) => {
     const unique = Date.now() + "-" + file.originalname.replace(/\s+/g, "_");
     cb(null, unique);
@@ -18,15 +22,12 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// --- Generate QR from text or URL ---
+// --- QR from text/URL ---
 app.post("/generate", async (req, res) => {
   try {
     const { data } = req.body;
     const qr = await QRCode.toDataURL(data, {
-      color: {
-        dark: "#7a00ff",   // purple QR pixels
-        light: "#000014"   // dark background
-      },
+      color: { dark: "#7a00ff", light: "#000014" },
       margin: 2,
       width: 400
     });
@@ -37,23 +38,20 @@ app.post("/generate", async (req, res) => {
   }
 });
 
-// --- Upload file and generate QR linking to it ---
+// --- File upload + QR generation ---
 app.post("/upload", upload.single("file"), async (req, res) => {
   try {
     const fileUrl = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
     const qr = await QRCode.toDataURL(fileUrl, {
-      color: {
-        dark: "#5a00ff",
-        light: "#000014"
-      },
+      color: { dark: "#5a00ff", light: "#000014" },
       margin: 2,
       width: 400
     });
     res.json({ qr, fileUrl });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "File upload failed" });
+    res.status(500).json({ error: "Upload failed" });
   }
 });
 
-app.listen(3000, () => console.log("⚫ Shadow QR v2 running at http://localhost:3000"));
+app.listen(3000, () => console.log("⚫ Shadow QR ready at http://localhost:3000"));
