@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shadow QR</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <div class="container">
+    <h1>⚫ Shadow QR</h1>
+    <p class="subtitle">Create & Scan QR Codes from the Shadows</p>
+
+    <div class="card">
+      <h2>Generate QR Code</h2>
+      <input type="text" id="qrInput" placeholder="Enter text or image URL"/>
+      <button id="generateBtn">Generate</button>
+      <canvas id="qrCanvas"></canvas>
+    </div>
+
+    <div class="card">
+      <h2>Scan QR Code</h2>
+      <video id="preview"></video>
+      <button id="scanBtn">Start Scan</button>
+      <p id="scanResult"></p>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <script src="script.js"></script>
+</body>
+</html>
