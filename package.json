@@ -1,7 +1,7 @@
 {
   "name": "shadow-qr",
   "version": "1.1.0",
-  "description": "Shadow QR - Generate and Scan QR Codes with Style",
+  "description": "Shadow QR - Generate and Scan QR Codes",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
