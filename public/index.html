@@ -9,7 +9,7 @@
 <body>
   <div class="container">
     <h1>⚫ Shadow QR</h1>
-    <p class="subtitle">Generate and scan custom dark-themed QR codes</p>
+    <p class="subtitle">Generate custom dark-themed QR codes</p>
 
     <!-- QR Generator -->
     <div class="card">
@@ -18,19 +18,11 @@
       <input type="file" id="fileInput" accept="image/*,video/*">
       <button id="generateBtn">Generate QR</button>
       <canvas id="qrCanvas"></canvas>
-    </div>
-
-    <!-- QR Scanner -->
-    <div class="card">
-      <h2>Scan QR Code</h2>
-      <div id="preview"></div>
-      <button id="scanBtn">Start Scan</button>
-      <p id="scanResult"></p>
+      <a id="downloadBtn" style="display:none; margin-top:10px;">Download QR</a>
     </div>
   </div>
 
   <!-- Libraries -->
-  <script src="https://unpkg.com/html5-qrcode"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
   <script src="script.js"></script>
 </body>
