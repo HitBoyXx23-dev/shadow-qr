@@ -38,7 +38,7 @@ generateBtn.addEventListener("click", async () => {
     {
       width: 300,
       margin: 2,
-      colorDark: "#9b59b6", // Purple QR
+      colorDark: "#9b5de5", // Purple QR
       colorLight: "#0a0a0a" // Dark background
     },
     (err, url) => {
@@ -48,7 +48,7 @@ generateBtn.addEventListener("click", async () => {
   );
 });
 
-// Draw QR with optional logo
+// Draw QR with logo
 function drawQR(dataUrl) {
   const ctx = qrCanvas.getContext("2d");
   const img = new Image();
@@ -66,7 +66,7 @@ function drawQR(dataUrl) {
     ctx.drawImage(img, 0, 0);
 
     const logo = new Image();
-    logo.src = "logo.png"; // replace with your logo path
+    logo.src = "logo.png"; // replace with your logo
     logo.onload = () => {
       const size = img.width * 0.2;
       const x = (img.width - size) / 2;
