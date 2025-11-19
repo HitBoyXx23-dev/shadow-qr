@@ -1,5 +1,5 @@
 // --------------------------
-// QR Generator (Purple QR)
+// QR Generator (Purple QR + Logo)
 // --------------------------
 const qrInput = document.getElementById("qrInput");
 const fileInput = document.getElementById("fileInput");
@@ -37,50 +37,25 @@ generateBtn.addEventListener("click", async () => {
     }
   }
 
-  // Generate purple QR
-  QRCode.toDataURL(
-    text,
-    {
-      width: 300,
-      margin: 2,
-      colorDark: "#9b5de5", // Purple QR
-      colorLight: "#0a0a0a" // Dark background
-    },
-    (err, url) => {
-      if (err) return console.error(err);
-      drawQR(url);
+  // Generate QR directly on canvas (purple)
+  QRCode.toCanvas(qrCanvas, text, {
+    width: 300,
+    margin: 2,
+    color: {
+      dark: "#9b5de5",  // Purple QR
+      light: "#0a0a0a"  // Dark background
     }
-  );
-});
+  }, function (err) {
+    if (err) return console.error(err);
 
-// Draw QR with logo
-function drawQR(dataUrl) {
-  const ctx = qrCanvas.getContext("2d");
-  const img = new Image();
-  img.src = dataUrl;
+    // Draw logo on top
+    const ctx = qrCanvas.getContext("2d");
+    const size = qrCanvas.width * 0.2;
+    const x = (qrCanvas.width - size) / 2;
+    const y = (qrCanvas.height - size) / 2;
 
-  img.onload = () => {
-    qrCanvas.width = 300;
-    qrCanvas.height = 300;
-    ctx.clearRect(0, 0, qrCanvas.width, qrCanvas.height);
-
-    // Fill dark background
-    ctx.fillStyle = "#0a0a0a";
-    ctx.fillRect(0, 0, qrCanvas.width, qrCanvas.height);
-
-    // Draw QR
-    ctx.drawImage(img, 0, 0, qrCanvas.width, qrCanvas.height);
-
-    // Draw logo
-    const drawLogo = () => {
-      const size = qrCanvas.width * 0.2;
-      const x = (qrCanvas.width - size) / 2;
-      const y = (qrCanvas.height - size) / 2;
-      ctx.drawImage(logo, x, y, size, size);
-    };
-
-    if (logo.complete) drawLogo();
-    else logo.onload = drawLogo;
+    if (logo.complete) ctx.drawImage(logo, x, y, size, size);
+    else logo.onload = () => ctx.drawImage(logo, x, y, size, size);
 
     // Enable download
     if (downloadBtn) {
@@ -88,8 +63,8 @@ function drawQR(dataUrl) {
       downloadBtn.download = "qr.png";
       downloadBtn.style.display = "inline-block";
     }
-  };
-}
+  });
+});
 
 // --------------------------
 // QR Scanner with Flip Camera
