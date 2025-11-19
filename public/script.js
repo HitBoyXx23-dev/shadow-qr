@@ -1,10 +1,15 @@
 // --------------------------
-// QR Generator
+// QR Generator (Purple QR)
 // --------------------------
 const qrInput = document.getElementById("qrInput");
 const fileInput = document.getElementById("fileInput");
 const generateBtn = document.getElementById("generateBtn");
 const qrCanvas = document.getElementById("qrCanvas");
+const downloadBtn = document.getElementById("downloadBtn");
+
+// Preload logo
+const logo = new Image();
+logo.src = "logo.png";
 
 generateBtn.addEventListener("click", async () => {
   let text = qrInput.value.trim();
@@ -32,7 +37,7 @@ generateBtn.addEventListener("click", async () => {
     }
   }
 
-  // Generate colored QR
+  // Generate purple QR
   QRCode.toDataURL(
     text,
     {
@@ -55,24 +60,34 @@ function drawQR(dataUrl) {
   img.src = dataUrl;
 
   img.onload = () => {
-    qrCanvas.width = img.width;
-    qrCanvas.height = img.height;
+    qrCanvas.width = 300;
+    qrCanvas.height = 300;
     ctx.clearRect(0, 0, qrCanvas.width, qrCanvas.height);
 
     // Fill dark background
     ctx.fillStyle = "#0a0a0a";
     ctx.fillRect(0, 0, qrCanvas.width, qrCanvas.height);
 
-    ctx.drawImage(img, 0, 0);
+    // Draw QR
+    ctx.drawImage(img, 0, 0, qrCanvas.width, qrCanvas.height);
 
-    const logo = new Image();
-    logo.src = "logo.png"; // replace with your logo
-    logo.onload = () => {
-      const size = img.width * 0.2;
-      const x = (img.width - size) / 2;
-      const y = (img.height - size) / 2;
+    // Draw logo
+    const drawLogo = () => {
+      const size = qrCanvas.width * 0.2;
+      const x = (qrCanvas.width - size) / 2;
+      const y = (qrCanvas.height - size) / 2;
       ctx.drawImage(logo, x, y, size, size);
     };
+
+    if (logo.complete) drawLogo();
+    else logo.onload = drawLogo;
+
+    // Enable download
+    if (downloadBtn) {
+      downloadBtn.href = qrCanvas.toDataURL("image/png");
+      downloadBtn.download = "qr.png";
+      downloadBtn.style.display = "inline-block";
+    }
   };
 }
 
@@ -103,7 +118,6 @@ scanBtn.addEventListener("click", async () => {
 
       currentCameraIndex = 0;
       startScan(cameras[currentCameraIndex].id);
-
     } catch (err) {
       console.error(err);
       alert("Camera error. Ensure permission granted and HTTPS used.");
@@ -144,7 +158,6 @@ async function startScan(cameraId) {
 
     scanning = true;
     scanBtn.textContent = "Stop Scan";
-
   } catch (err) {
     console.error("Failed to start camera:", err);
     alert("Camera failed. Try a different camera or check permissions.");
