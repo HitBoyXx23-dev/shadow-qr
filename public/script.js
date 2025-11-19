@@ -1,18 +1,11 @@
+// --------------------------
+// QR Generator
+// --------------------------
 const qrInput = document.getElementById("qrInput");
 const fileInput = document.getElementById("fileInput");
 const generateBtn = document.getElementById("generateBtn");
 const qrCanvas = document.getElementById("qrCanvas");
 
-const scanBtn = document.getElementById("scanBtn");
-const scanResult = document.getElementById("scanResult");
-const preview = document.getElementById("preview");
-
-let scanning = false;
-let html5QrCode = null;
-
-// --------------------------
-// Generate QR
-// --------------------------
 generateBtn.addEventListener("click", async () => {
   let text = qrInput.value.trim();
   const file = fileInput.files[0];
@@ -33,14 +26,14 @@ generateBtn.addEventListener("click", async () => {
     }
   }
 
-  // Generate colored QR (purple)
+  // Generate colored QR
   QRCode.toDataURL(
     text,
     {
       width: 300,
       margin: 2,
-      colorDark: "#9b59b6",  // Purple
-      colorLight: "#0a0a0a"  // Dark background
+      colorDark: "#9b59b6", // purple
+      colorLight: "#0a0a0a" // dark background
     },
     (err, url) => {
       if (err) return console.error(err);
@@ -49,9 +42,7 @@ generateBtn.addEventListener("click", async () => {
   );
 });
 
-// --------------------------
-// Draw QR with logo
-// --------------------------
+// Draw QR with optional logo
 function drawQR(dataUrl) {
   const ctx = qrCanvas.getContext("2d");
   const img = new Image();
@@ -63,9 +54,8 @@ function drawQR(dataUrl) {
     ctx.clearRect(0, 0, qrCanvas.width, qrCanvas.height);
     ctx.drawImage(img, 0, 0);
 
-    // Overlay logo
     const logo = new Image();
-    logo.src = "logo.png"; // replace with your logo path
+    logo.src = "logo.png"; // replace with your logo
     logo.onload = () => {
       const size = img.width * 0.2;
       const x = (img.width - size) / 2;
@@ -76,37 +66,32 @@ function drawQR(dataUrl) {
 }
 
 // --------------------------
-// QR Scanner
+// QR Scanner with Flip Camera
 // --------------------------
+const scanBtn = document.getElementById("scanBtn");
+const scanResult = document.getElementById("scanResult");
+const preview = document.getElementById("preview");
+
+// Create Flip Camera button
+const flipBtn = document.createElement("button");
+flipBtn.textContent = "Flip Camera";
+flipBtn.style.marginTop = "10px";
+scanBtn.parentNode.insertBefore(flipBtn, scanBtn.nextSibling);
+
+let scanning = false;
+let html5QrCode = null;
+let cameras = [];
+let currentCameraIndex = 0;
+
+// Start/Stop Scan
 scanBtn.addEventListener("click", async () => {
   if (!scanning) {
     try {
-      const cameras = await Html5Qrcode.getCameras();
+      cameras = await Html5Qrcode.getCameras();
       if (!cameras || cameras.length === 0) return alert("No camera found.");
 
-      const cameraId = cameras[0].id;
-      html5QrCode = new Html5Qrcode("preview");
-
-      await html5QrCode.start(
-        cameraId,
-        { fps: 10, qrbox: 250, disableFlip: false },
-        (decodedText) => {
-          // Show scanned text as clickable link
-          scanResult.innerHTML = `Scanned: <a href="${decodedText}" target="_blank">${decodedText}</a>`;
-
-          // Automatically open if URL
-          if (/^https?:\/\//.test(decodedText)) {
-            window.open(decodedText, "_blank");
-          }
-
-          html5QrCode.stop();
-          scanning = false;
-          scanBtn.textContent = "Start Scan";
-        }
-      );
-
-      scanning = true;
-      scanBtn.textContent = "Stop Scan";
+      currentCameraIndex = 0;
+      startScan(cameras[currentCameraIndex].id);
 
     } catch (err) {
       console.error(err);
@@ -118,3 +103,42 @@ scanBtn.addEventListener("click", async () => {
     scanBtn.textContent = "Start Scan";
   }
 });
+
+// Flip Camera
+flipBtn.addEventListener("click", async () => {
+  if (!scanning || cameras.length < 2) return;
+
+  await html5QrCode.stop();
+  currentCameraIndex = (currentCameraIndex + 1) % cameras.length;
+  startScan(cameras[currentCameraIndex].id);
+});
+
+// Helper: Start scanning with given camera
+async function startScan(cameraId) {
+  html5QrCode = new Html5Qrcode("preview");
+
+  try {
+    await html5QrCode.start(
+      cameraId,
+      { fps: 10, qrbox: 250, disableFlip: false },
+      (decodedText) => {
+        // Display clickable link in-page
+        scanResult.innerHTML = `Scanned: <a href="${decodedText}" target="_blank">${decodedText}</a>`;
+
+        // Automatically open URL
+        if (/^https?:\/\//.test(decodedText)) window.open(decodedText, "_blank");
+
+        html5QrCode.stop();
+        scanning = false;
+        scanBtn.textContent = "Start Scan";
+      }
+    );
+
+    scanning = true;
+    scanBtn.textContent = "Stop Scan";
+
+  } catch (err) {
+    console.error("Failed to start camera:", err);
+    alert("Camera failed. Try a different camera or check permissions.");
+  }
+}
