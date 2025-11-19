@@ -10,9 +10,15 @@ generateBtn.addEventListener("click", async () => {
   let text = qrInput.value.trim();
   const file = fileInput.files[0];
 
-  if (!text && !file) return alert("Enter text or select a file!");
+  if (!text && !file) return alert("Enter text or select a file/video!");
 
+  // Handle file/video uploads
   if (file) {
+    const allowedTypes = ["image", "video"];
+    if (!allowedTypes.some(type => file.type.startsWith(type))) {
+      return alert("Only images and videos are allowed!");
+    }
+
     const formData = new FormData();
     formData.append("file", file);
 
@@ -32,8 +38,8 @@ generateBtn.addEventListener("click", async () => {
     {
       width: 300,
       margin: 2,
-      colorDark: "#9b59b6", // purple
-      colorLight: "#0a0a0a" // dark background
+      colorDark: "#9b59b6", // Purple QR
+      colorLight: "#0a0a0a" // Dark background
     },
     (err, url) => {
       if (err) return console.error(err);
@@ -52,10 +58,15 @@ function drawQR(dataUrl) {
     qrCanvas.width = img.width;
     qrCanvas.height = img.height;
     ctx.clearRect(0, 0, qrCanvas.width, qrCanvas.height);
+
+    // Fill dark background
+    ctx.fillStyle = "#0a0a0a";
+    ctx.fillRect(0, 0, qrCanvas.width, qrCanvas.height);
+
     ctx.drawImage(img, 0, 0);
 
     const logo = new Image();
-    logo.src = "logo.png"; // replace with your logo
+    logo.src = "logo.png"; // replace with your logo path
     logo.onload = () => {
       const size = img.width * 0.2;
       const x = (img.width - size) / 2;
@@ -72,7 +83,7 @@ const scanBtn = document.getElementById("scanBtn");
 const scanResult = document.getElementById("scanResult");
 const preview = document.getElementById("preview");
 
-// Create Flip Camera button
+// Flip camera button
 const flipBtn = document.createElement("button");
 flipBtn.textContent = "Flip Camera";
 flipBtn.style.marginTop = "10px";
@@ -113,7 +124,7 @@ flipBtn.addEventListener("click", async () => {
   startScan(cameras[currentCameraIndex].id);
 });
 
-// Helper: Start scanning with given camera
+// Helper: Start scanning with a camera
 async function startScan(cameraId) {
   html5QrCode = new Html5Qrcode("preview");
 
@@ -122,10 +133,7 @@ async function startScan(cameraId) {
       cameraId,
       { fps: 10, qrbox: 250, disableFlip: false },
       (decodedText) => {
-        // Display clickable link in-page
         scanResult.innerHTML = `Scanned: <a href="${decodedText}" target="_blank">${decodedText}</a>`;
-
-        // Automatically open URL
         if (/^https?:\/\//.test(decodedText)) window.open(decodedText, "_blank");
 
         html5QrCode.stop();
