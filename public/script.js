@@ -8,11 +8,11 @@ const scanResult = document.getElementById("scanResult");
 const preview = document.getElementById("preview");
 
 let scanning = false;
-let html5QrCode;
+let html5QrCode = null;
 
-// ----------------------
+// --------------------------
 // Generate QR
-// ----------------------
+// --------------------------
 generateBtn.addEventListener("click", async () => {
   const text = input.value.trim();
   const file = fileInput.files[0];
@@ -21,31 +21,31 @@ generateBtn.addEventListener("click", async () => {
     return alert("Enter text/URL or select a file!");
   }
 
-  let res, result;
+  let qrText = text;
 
   if (file) {
     const formData = new FormData();
     formData.append("file", file);
 
-    res = await fetch("/upload", { method: "POST", body: formData });
-    result = await res.json();
-    alert("File uploaded! Scan QR to open:\n" + result.fileUrl);
-
-  } else {
-    res = await fetch("/generate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ data: text })
-    });
-    result = await res.json();
+    try {
+      const res = await fetch("/upload", { method: "POST", body: formData });
+      const result = await res.json();
+      qrText = result.fileUrl;
+      alert(`File uploaded! QR links to: ${qrText}`);
+    } catch (err) {
+      return alert("File upload failed!");
+    }
   }
 
-  drawQR(result.qr);
+  QRCode.toDataURL(qrText, { width: 300, margin: 2 }, (err, url) => {
+    if (err) return console.error(err);
+    drawQR(url);
+  });
 });
 
-// ----------------------
-// Draw QR Helper (with logo)
-// ----------------------
+// --------------------------
+// Draw QR on canvas
+// --------------------------
 function drawQR(dataUrl) {
   const ctx = qrCanvas.getContext("2d");
   const img = new Image();
@@ -54,61 +54,59 @@ function drawQR(dataUrl) {
   img.onload = () => {
     qrCanvas.width = img.width;
     qrCanvas.height = img.height;
-
     ctx.clearRect(0, 0, qrCanvas.width, qrCanvas.height);
     ctx.drawImage(img, 0, 0);
 
-    // Overlay logo
     const logo = new Image();
-    logo.src = "logo.png";
+    logo.src = "logo.png"; // replace with your logo
     logo.onload = () => {
-      const logoSize = img.width * 0.2;
-      const x = (img.width - logoSize) / 2;
-      const y = (img.height - logoSize) / 2;
-      ctx.drawImage(logo, x, y, logoSize, logoSize);
+      const size = img.width * 0.2;
+      const x = (img.width - size) / 2;
+      const y = (img.height - size) / 2;
+      ctx.drawImage(logo, x, y, size, size);
     };
   };
 }
 
-// ----------------------
-// QR Scanner (FULLY FIXED)
-// ----------------------
+// --------------------------
+// QR Scanner
+// --------------------------
 scanBtn.addEventListener("click", async () => {
   if (!scanning) {
-    html5QrCode = new Html5Qrcode("preview");
-
     try {
-      await html5QrCode.start(
-        { facingMode: "environment" },
-        {
-          fps: 10,
-          qrbox: { width: 250, height: 250 },
-          disableFlip: false
-        },
-        (decodedText) => {
-          scanResult.textContent = "Result: " + decodedText;
+      const cameras = await Html5Qrcode.getCameras();
+      if (!cameras || cameras.length === 0) {
+        return alert("No camera found on this device.");
+      }
 
-          html5QrCode.stop().then(() => {
-            scanning = false;
-            scanBtn.textContent = "Start Scan";
-          });
+      const cameraId = cameras[0].id;
+      html5QrCode = new Html5Qrcode("preview");
+
+      await html5QrCode.start(
+        cameraId,
+        { fps: 10, qrbox: 250, disableFlip: false },
+        (decodedText) => {
+          scanResult.innerHTML = `Scanned: <a href="${decodedText}" target="_blank">${decodedText}</a>`;
+
+          if (/^https?:\/\//.test(decodedText)) {
+            window.open(decodedText, "_blank");
+          }
+
+          html5QrCode.stop();
+          scanning = false;
+          scanBtn.textContent = "Start Scan";
         }
       );
+
+      scanning = true;
+      scanBtn.textContent = "Stop Scan";
+
     } catch (err) {
-      console.error("Scan failed:", err);
-      return;
+      console.error("Camera error:", err);
+      alert("Failed to start camera. Ensure permission granted and use HTTPS.");
     }
-
-    scanning = true;
-    scanBtn.textContent = "Stop Scan";
-
   } else {
-    try {
-      await html5QrCode.stop();
-    } catch (e) {
-      console.warn("Stop error:", e);
-    }
-
+    await html5QrCode.stop();
     scanning = false;
     scanBtn.textContent = "Start Scan";
   }
