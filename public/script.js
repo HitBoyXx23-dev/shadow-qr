@@ -1,4 +1,4 @@
-const input = document.getElementById("qrInput");
+const qrInput = document.getElementById("qrInput");
 const fileInput = document.getElementById("fileInput");
 const generateBtn = document.getElementById("generateBtn");
 const qrCanvas = document.getElementById("qrCanvas");
@@ -14,14 +14,10 @@ let html5QrCode = null;
 // Generate QR
 // --------------------------
 generateBtn.addEventListener("click", async () => {
-  const text = input.value.trim();
+  let text = qrInput.value.trim();
   const file = fileInput.files[0];
 
-  if (!text && !file) {
-    return alert("Enter text/URL or select a file!");
-  }
-
-  let qrText = text;
+  if (!text && !file) return alert("Enter text or select a file!");
 
   if (file) {
     const formData = new FormData();
@@ -30,21 +26,31 @@ generateBtn.addEventListener("click", async () => {
     try {
       const res = await fetch("/upload", { method: "POST", body: formData });
       const result = await res.json();
-      qrText = result.fileUrl;
-      alert(`File uploaded! QR links to: ${qrText}`);
+      text = result.fileUrl;
+      alert(`File uploaded! QR will link to: ${text}`);
     } catch (err) {
       return alert("File upload failed!");
     }
   }
 
-  QRCode.toDataURL(qrText, { width: 300, margin: 2 }, (err, url) => {
-    if (err) return console.error(err);
-    drawQR(url);
-  });
+  // Generate colored QR (purple)
+  QRCode.toDataURL(
+    text,
+    {
+      width: 300,
+      margin: 2,
+      colorDark: "#9b59b6",  // Purple
+      colorLight: "#0a0a0a"  // Dark background
+    },
+    (err, url) => {
+      if (err) return console.error(err);
+      drawQR(url);
+    }
+  );
 });
 
 // --------------------------
-// Draw QR on canvas
+// Draw QR with logo
 // --------------------------
 function drawQR(dataUrl) {
   const ctx = qrCanvas.getContext("2d");
@@ -57,8 +63,9 @@ function drawQR(dataUrl) {
     ctx.clearRect(0, 0, qrCanvas.width, qrCanvas.height);
     ctx.drawImage(img, 0, 0);
 
+    // Overlay logo
     const logo = new Image();
-    logo.src = "logo.png"; // replace with your logo
+    logo.src = "logo.png"; // replace with your logo path
     logo.onload = () => {
       const size = img.width * 0.2;
       const x = (img.width - size) / 2;
@@ -75,9 +82,7 @@ scanBtn.addEventListener("click", async () => {
   if (!scanning) {
     try {
       const cameras = await Html5Qrcode.getCameras();
-      if (!cameras || cameras.length === 0) {
-        return alert("No camera found on this device.");
-      }
+      if (!cameras || cameras.length === 0) return alert("No camera found.");
 
       const cameraId = cameras[0].id;
       html5QrCode = new Html5Qrcode("preview");
@@ -86,8 +91,10 @@ scanBtn.addEventListener("click", async () => {
         cameraId,
         { fps: 10, qrbox: 250, disableFlip: false },
         (decodedText) => {
+          // Show scanned text as clickable link
           scanResult.innerHTML = `Scanned: <a href="${decodedText}" target="_blank">${decodedText}</a>`;
 
+          // Automatically open if URL
           if (/^https?:\/\//.test(decodedText)) {
             window.open(decodedText, "_blank");
           }
@@ -102,8 +109,8 @@ scanBtn.addEventListener("click", async () => {
       scanBtn.textContent = "Stop Scan";
 
     } catch (err) {
-      console.error("Camera error:", err);
-      alert("Failed to start camera. Ensure permission granted and use HTTPS.");
+      console.error(err);
+      alert("Camera error. Ensure permission granted and HTTPS used.");
     }
   } else {
     await html5QrCode.stop();
