@@ -3,35 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shadow QR</title>
+  <title>⚫ Shadow QR</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
     <h1>⚫ Shadow QR</h1>
-    <p class="subtitle">Generate and Scan custom dark-themed QR codes</p>
+    <p class="subtitle">Generate and scan custom dark-themed QR codes</p>
 
+    <!-- Generate QR Card -->
     <div class="card">
       <h2>Create QR</h2>
-      <input type="text" id="qrInput" placeholder="Enter text or URL" />
-      <input type="file" id="fileInput" />
+      <input type="text" id="qrInput" placeholder="Enter text or URL">
+      <input type="file" id="fileInput">
       <button id="generateBtn">Generate QR</button>
-      <canvas id="qrCanvas" class="glow"></canvas>
+      <canvas id="qrCanvas"></canvas>
     </div>
 
+    <!-- Scan QR Card -->
     <div class="card">
       <h2>Scan QR Code</h2>
-
-      <!-- FIXED: html5-qrcode REQUIRES a DIV, not a <video> -->
-      <div id="preview" style="width:100%; height:300px; background:#000;"></div>
-
+      <div id="preview"></div>
       <button id="scanBtn">Start Scan</button>
       <p id="scanResult"></p>
     </div>
   </div>
 
-  <!-- html5-qrcode library -->
+  <!-- Libraries -->
   <script src="https://unpkg.com/html5-qrcode"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
